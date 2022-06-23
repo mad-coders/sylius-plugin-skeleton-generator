@@ -1,13 +1,17 @@
 terraform {
   required_providers {
     aws = {
-      region  = "eu-central-1"
       source  = "hashicorp/aws"
       version = "~> 3.0"
     }
   }
+}
 
-  resource "aws_s3_bucket" "ngstatic" {
+provider "aws" {
+    region  = "eu-central-1"
+}
+
+resource "aws_s3_bucket" "ngstatic" {
     bucket = "sylius-plugin-skel-gen-ng01-prod"
 
     tags = {
@@ -15,4 +19,3 @@ terraform {
         Environment = "Production"
     }
   }
-}
