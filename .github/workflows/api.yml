@@ -1,0 +1,40 @@
+name: "API Development pipeline"
+on:
+  push:
+    branches: [ 'main' ]
+    paths: 
+      - 'api/**'
+      - '.github/workflows/api.yml'
+  pull_request:
+    branches: [ 'main' ]
+    paths: 
+      - 'api/**'
+      - '.github/workflows/api.yml'
+  
+jobs:
+  build:
+    defaults:
+      run:
+        working-directory: ./api
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - 'ubuntu-latest'
+        node-version: 
+          - '16.x'
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: yarn install and build
+        run: |
+          yarn install
+          yarn build
+
+      - run: yarn test
