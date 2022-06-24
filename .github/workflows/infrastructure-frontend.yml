@@ -1,4 +1,4 @@
-name: "API Development pipeline"
+name: "Infrastructure of frontend application"
 on:
   push:
     branches: [ 'main' ]
