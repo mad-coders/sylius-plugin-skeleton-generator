@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import {FormArray, FormBuilder, Validators} from "@angular/forms";
 import {camelCase, kebabCase, snakeCase} from "literal-case";
+import {GeneratorService} from "./services/generator.service";
+import {IPluginNameRequestData} from "./ interfaces/plugin-name-request-data.interface";
+import {IPluginAuthors} from "./ interfaces/plugin-authors.interface";
 
 @Component({
   selector: 'app-root',
@@ -33,7 +36,8 @@ export class AppComponent {
     authors: this.fb.array([])
   });
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder,
+              public generatorService: GeneratorService) { }
 
   async ngOnInit(): Promise<void> {
     await this.init();
@@ -148,10 +152,12 @@ export class AppComponent {
     const pluginNameInputSnake = formRaw.pluginNameInputSnake ? formRaw.pluginNameInputSnake : '';
     const pluginComposePackageName = formRaw.pluginComposePackageName ? formRaw.pluginComposePackageName : '';
     const pluginDescription = formRaw.pluginDescription ? formRaw.pluginDescription : '';
-    const authorsList = formRaw.authors;
     const rodoCheckboxChecked = formRaw.rodoCheckbox ? formRaw.rodoCheckbox : false;
+    const emailForSendingPlugin = formRaw.emailForSendingPlugin ? formRaw.emailForSendingPlugin : '';
+    // @ts-ignore
+    const authorsList: IPluginAuthors[] = formRaw.authors;
 
-    const pluginGeneratorRequestData = {
+    const pluginGeneratorRequestData: IPluginNameRequestData = {
       syliusVersion,
       namespace,
       pluginNameInput,
@@ -160,9 +166,11 @@ export class AppComponent {
       pluginComposePackageName,
       pluginDescription,
       rodoCheckboxChecked,
+      emailForSendingPlugin,
       authorsList
     };
 
-    console.log('PluginGeneratorRequestData: ', formRaw.rodoCheckbox);
+    // await this.generatorService.startPluginGenerate(pluginGeneratorRequestData);
+    console.log('PluginGeneratorRequestData: ', pluginGeneratorRequestData);
   }
 }
