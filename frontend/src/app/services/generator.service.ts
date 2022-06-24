@@ -12,7 +12,7 @@ export class GeneratorService {
   }
 
   startPluginGenerate(body: IPluginNameRequestData): Observable<IPluginNameRequestData> {
-    return this._httpClient.post<IPluginNameRequestData>(`${environment.apiUrl}/superApi`, body);
+    return this._httpClient.post<IPluginNameRequestData>(`${environment.apiUrl}/request-new`, body);
   }
 }
 

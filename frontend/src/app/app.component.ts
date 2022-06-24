@@ -171,7 +171,9 @@ export class AppComponent {
       authorsList
     };
 
-    // await this.generatorService.startPluginGenerate(pluginGeneratorRequestData);
-    console.log('PluginGeneratorRequestData: ', pluginGeneratorRequestData);
+    const request = await this.generatorService.startPluginGenerate(pluginGeneratorRequestData).toPromise();
+    if (request) {
+      console.log('request: ', request);
+    }
   }
 }
