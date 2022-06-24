@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiUrl: `https://sylius-plugin-generator-dev.madcoders.dev`,
+  apiUrl: `https://sylius-plugin-generator-api.madcoders.dev`,
 };
 
 /*
