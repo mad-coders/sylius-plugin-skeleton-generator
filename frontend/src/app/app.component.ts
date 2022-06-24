@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {FormArray, FormBuilder, Validators} from "@angular/forms";
 import {camelCase, kebabCase, snakeCase} from "literal-case";
+import {GeneratorService} from "./services/generator.service";
+import {IPluginNameRequestData} from "./ interfaces/plugin-name-request-data.interface";
+import {IPluginAuthors} from "./ interfaces/plugin-authors.interface";
 
 @Component({
   selector: 'app-root',
@@ -18,7 +21,7 @@ export class AppComponent {
 
   pluginNameForm = this.fb.group({
     syliusVersion: ['', Validators.required],
-    namespace: ['',  Validators.required],
+    namespace: ['', Validators.required],
     pluginNameInput: ['', Validators.required],
     pluginNameInputCamel: ['', Validators.required],
     pluginNameInputSnake: ['', Validators.required],
@@ -29,11 +32,13 @@ export class AppComponent {
         Validators.email,
         Validators.required
       ])],
-    rodoCheckbox:[false,  Validators.requiredTrue],
+    rodoCheckbox: [false, Validators.requiredTrue],
     authors: this.fb.array([])
   });
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder,
+              public generatorService: GeneratorService) {
+  }
 
   async ngOnInit(): Promise<void> {
     await this.init();
@@ -143,15 +148,17 @@ export class AppComponent {
     const formRaw = this.pluginNameForm.getRawValue();
     const syliusVersion = formRaw.syliusVersion ? formRaw.syliusVersion : '';
     const namespace = formRaw.namespace ? formRaw.namespace : '';
-    const pluginNameInput = formRaw.pluginNameInput ?  formRaw.pluginNameInput: '';
+    const pluginNameInput = formRaw.pluginNameInput ? formRaw.pluginNameInput : '';
     const pluginNameInputCamel = formRaw.pluginNameInputCamel ? formRaw.pluginNameInputCamel : '';
     const pluginNameInputSnake = formRaw.pluginNameInputSnake ? formRaw.pluginNameInputSnake : '';
     const pluginComposePackageName = formRaw.pluginComposePackageName ? formRaw.pluginComposePackageName : '';
     const pluginDescription = formRaw.pluginDescription ? formRaw.pluginDescription : '';
-    const authorsList = formRaw.authors;
     const rodoCheckboxChecked = formRaw.rodoCheckbox ? formRaw.rodoCheckbox : false;
+    const emailForSendingPlugin = formRaw.emailForSendingPlugin ? formRaw.emailForSendingPlugin : '';
+    // @ts-ignore
+    const authorsList: IPluginAuthors[] = formRaw.authors;
 
-    const pluginGeneratorRequestData = {
+    const pluginGeneratorRequestData: IPluginNameRequestData = {
       syliusVersion,
       namespace,
       pluginNameInput,
@@ -160,9 +167,13 @@ export class AppComponent {
       pluginComposePackageName,
       pluginDescription,
       rodoCheckboxChecked,
+      emailForSendingPlugin,
       authorsList
     };
 
-    console.log('PluginGeneratorRequestData: ', formRaw.rodoCheckbox);
+    const requestStatus = await this.generatorService.startPluginGenerate(pluginGeneratorRequestData);
+    if (requestStatus) {
+      console.log('request: ', requestStatus);
+    }
   }
 }

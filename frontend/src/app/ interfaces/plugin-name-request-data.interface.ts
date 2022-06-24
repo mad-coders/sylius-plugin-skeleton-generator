@@ -8,5 +8,7 @@ export class IPluginNameRequestData {
   pluginNameInputSnake!: string;
   pluginComposePackageName!: string;
   pluginDescription!: string;
+  emailForSendingPlugin!: string;
+  rodoCheckboxChecked!: boolean;
   authorsList?: Array<IPluginAuthors>;
 }
