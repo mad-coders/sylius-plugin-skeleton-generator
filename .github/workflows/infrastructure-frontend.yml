@@ -40,7 +40,7 @@ jobs:
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform init -var-file="prod.tfvars" -backend-config="backend.prod.hcl"
 
       - name: Terraform Validate
         id: validate
@@ -48,8 +48,13 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color
+        run: terraform plan -no-color -var-file="prod.tfvars" -out prod.plan
         continue-on-error: true
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: prod.plan
+          path: prod.plan
 
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
@@ -112,6 +117,12 @@ jobs:
       - name: Stop pipeline if terraform plan failed
         if: steps.plan.outcome == 'failure'
         run: exit 1
+
+      - uses: actions/download-artifact@v3
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        with:
+          name: prod.plan
+          path: prod.plan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
