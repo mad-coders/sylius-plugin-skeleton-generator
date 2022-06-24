@@ -1,4 +1,4 @@
-name: "API Development pipeline"
+name: "Angular frontend application"
 on:
   push:
     branches: [ 'main' ]
@@ -12,7 +12,7 @@ on:
       - '.github/workflows/frontend.yml'
   
 jobs:
-  terraform:
+  build-angular:
     defaults:
       run:
         working-directory: ./frontend
