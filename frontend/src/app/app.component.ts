@@ -18,12 +18,12 @@ export class AppComponent {
 
   pluginNameForm = this.fb.group({
     syliusVersion: ['', Validators.required],
-    namespace: ['', ],
-    pluginNameInput: [''],
-    pluginNameInputCamel: [''],
-    pluginNameInputSnake: [''],
-    pluginComposePackageName: [''],
-    pluginDescription: [''],
+    namespace: ['',  Validators.required],
+    pluginNameInput: ['', Validators.required],
+    pluginNameInputCamel: ['', Validators.required],
+    pluginNameInputSnake: ['', Validators.required],
+    pluginComposePackageName: ['', Validators.required],
+    pluginDescription: ['', Validators.required],
     authors: this.fb.array([])
   });
 
@@ -48,7 +48,9 @@ export class AppComponent {
     const authorForm = this.fb.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: ['', Validators.required]
+      email: ['',
+        Validators.compose(
+          [Validators.email, Validators.required])]
     });
 
     this.authors.push(authorForm);
@@ -116,13 +118,13 @@ export class AppComponent {
   };
 
   async onSubmit() {
-    console.log(this.pluginNameForm.value);
     await this.generatePlugin();
   }
 
   async generatePlugin(): Promise<void> {
+    console.log('this.pluginNameForm.invalid: ', this.pluginNameForm.invalid)
     if (this.pluginNameForm.invalid || this.pluginNameForm.pristine) {
-      console.log('invalid: ');
+      console.log('invalid:');
 
       return;
     }
