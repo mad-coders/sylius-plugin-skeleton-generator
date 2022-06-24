@@ -1,0 +1,49 @@
+name: "API Development pipeline"
+on:
+  push:
+    branches: [ 'main' ]
+    paths: 
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [ 'main' ]
+    paths: 
+      - 'frontend/**'
+      - '.github/workflows/frontend.yml'
+  
+jobs:
+  terraform:
+    defaults:
+      run:
+        working-directory: ./frontend
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    runs-on: ${{matrix.os}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - 'ubuntu-latest'
+        node-version: 
+          - '18.3.x'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: npm install and build
+        run: |
+          npm install
+          npm run build:prod
