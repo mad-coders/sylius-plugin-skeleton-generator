@@ -24,6 +24,12 @@ export class AppComponent {
     pluginNameInputSnake: ['', Validators.required],
     pluginComposePackageName: ['', Validators.required],
     pluginDescription: ['', Validators.required],
+    emailForSendingPlugin: ['',
+      Validators.compose([
+        Validators.email,
+        Validators.required
+      ])],
+    rodoCheckbox:[false,  Validators.requiredTrue],
     authors: this.fb.array([])
   });
 
@@ -38,6 +44,7 @@ export class AppComponent {
     this.transformValueForPluginNameInputCamel();
     this.transformValueForPluginNameInputSnake();
     this.transformValueForPluginComposePackageName();
+    this.addAuthor();
   }
 
   get authors() {
@@ -117,15 +124,19 @@ export class AppComponent {
     })
   };
 
-  async onSubmit() {
-    await this.generatePlugin();
+  generatePlugin() {
+    const sendingFormBlock = document.getElementById('sendingFormBlock') as HTMLInputElement | null;
+    const submitFormBlock = document.getElementById('submitFormBlock') as HTMLInputElement | null;
+    sendingFormBlock?.classList.add('block');
+    sendingFormBlock?.classList.remove('hidden');
+    submitFormBlock?.classList.add('hidden');
+    submitFormBlock?.classList.remove('block');
   }
 
-  async generatePlugin(): Promise<void> {
+  async onSubmit(): Promise<void> {
     console.log('this.pluginNameForm.invalid: ', this.pluginNameForm.invalid)
     if (this.pluginNameForm.invalid || this.pluginNameForm.pristine) {
       console.log('invalid:');
-
       return;
     }
 
@@ -138,6 +149,7 @@ export class AppComponent {
     const pluginComposePackageName = formRaw.pluginComposePackageName ? formRaw.pluginComposePackageName : '';
     const pluginDescription = formRaw.pluginDescription ? formRaw.pluginDescription : '';
     const authorsList = formRaw.authors;
+    const rodoCheckboxChecked = formRaw.rodoCheckbox ? formRaw.rodoCheckbox : false;
 
     const pluginGeneratorRequestData = {
       syliusVersion,
@@ -147,9 +159,10 @@ export class AppComponent {
       pluginNameInputCamel,
       pluginComposePackageName,
       pluginDescription,
+      rodoCheckboxChecked,
       authorsList
     };
 
-    console.log('PluginGeneratorRequestData: ', pluginGeneratorRequestData);
+    console.log('PluginGeneratorRequestData: ', formRaw.rodoCheckbox);
   }
 }
