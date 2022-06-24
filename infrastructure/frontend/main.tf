@@ -283,7 +283,7 @@ output "frontend_bucket_region" {
     value = aws_s3_bucket.ngapp.region
 }
 
-output "frontend_cf_distributioon_id" {
+output "frontend_cf_distribution_id" {
     description = "Angular application - CF distribution id"
     value = aws_cloudfront_distribution.ngapp.id
 }
