@@ -51,10 +51,11 @@ jobs:
         run: terraform plan -no-color -var-file="prod.tfvars" -out prod.plan
         continue-on-error: true
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: prod.plan
-          path: ./infrastructure/frontend/prod.plan
+      # not needed yet
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: prod.plan
+      #     path: ./infrastructure/frontend/prod.plan
 
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
@@ -126,11 +127,12 @@ jobs:
           echo "::set-output name=frontend_bucket_region::"$(terraform output -no-color -raw frontend_bucket_region)
           echo "::set-output name=frontend_cf_distribution_id::"$(terraform output -no-color -raw frontend_cf_distribution_id)
 
-      - uses: actions/download-artifact@v3
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        with:
-          name: prod.plan
-          path: ./infrastructure/frontend/prod.plan
+      # not needed yet
+      # - uses: actions/download-artifact@v3
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   with:
+      #     name: prod.plan
+      #     path: ./infrastructure/frontend/prod.plan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
