@@ -48,15 +48,27 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: reggionick/s3-deploy@v3
+      - id: install-aws-cli
+        uses: unfor19/install-aws-cli-action@v1.0.3
         with:
-          folder: ./dist
-          bucket: ${{ secrets.FRONTEND_S3_BUCKET }}
-          bucket-region: ${{ secrets.FRONTEND_S3_BUCKET_REGION }}
-          dist-id: ${{ secrets.FRONTEND_CLOUDFRONT_DISTRIBUTION_ID }}
-          invalidation: /
-          delete-removed: true
-          no-cache: true
-          private: true
+          version: 2     # default
+          verbose: false # default
+          arch: amd64    # allowed values: amd64, arm64
+          rootdir: ""    # defaults to "PWD"
+          workdir: ""    # defaults to "PWD/unfor19-awscli"
+
+      - name: deploy to S3
+        run: aws s3 sync -—delete ./dist s3://${{ secrets.FRONTEND_S3_BUCKET }} 
+
+      # - name: Deploy
+      #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      #   uses: reggionick/s3-deploy@v3
+      #   with:
+      #     folder: ./dist
+      #     bucket: ${{ secrets.FRONTEND_S3_BUCKET }}
+      #     bucket-region: ${{ secrets.FRONTEND_S3_BUCKET_REGION }}
+      #     dist-id: ${{ secrets.FRONTEND_CLOUDFRONT_DISTRIBUTION_ID }}
+      #     invalidation: /
+      #     delete-removed: true
+      #     no-cache: true
+      #     private: true
