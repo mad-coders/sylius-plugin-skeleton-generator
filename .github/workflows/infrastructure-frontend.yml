@@ -119,14 +119,6 @@ jobs:
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      - name: Set terraform outputs to terraform states
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        id: tfoutput
-        run: |
-          echo "::set-output name=frontend_bucket_name::"$(terraform output -no-color -raw frontend_bucket_name)
-          echo "::set-output name=frontend_bucket_region::"$(terraform output -no-color -raw frontend_bucket_region)
-          echo "::set-output name=frontend_cf_distribution_id::"$(terraform output -no-color -raw frontend_cf_distribution_id)
-
       # not needed yet
       # - uses: actions/download-artifact@v3
       #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -138,6 +130,14 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply prod.plan
      
+      - name: Set terraform outputs to terraform states
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: tfoutput
+        run: |
+          echo "::set-output name=frontend_bucket_name::"$(terraform output -no-color -raw frontend_bucket_name)
+          echo "::set-output name=frontend_bucket_region::"$(terraform output -no-color -raw frontend_bucket_region)
+          echo "::set-output name=frontend_cf_distribution_id::"$(terraform output -no-color -raw frontend_cf_distribution_id)
+
       - uses: mmercan/actions-set-secret@v/4.0.0
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         with:
@@ -149,15 +149,15 @@ jobs:
       - uses: mmercan/actions-set-secret@v/4.0.0
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         with:
-          name: 'FRONTEND_S3_BUCKET'
+          name: 'FRONTEND_S3_BUCKET_REGION'
           value: ${{ steps.tfoutput.outputs.frontend_bucket_region }}
           repository: ${{ github.repository }}
-          token: ${{ secrets.FRONTEND_S3_BUCKET_REGION }}
+          token: ${{ secrets.MY_ACCESS_TOKEN }}
 
       - uses: mmercan/actions-set-secret@v/4.0.0
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         with:
-          name: 'FRONTEND_S3_BUCKET'
+          name: 'FRONTEND_CLOUDFRONT_DISTRIBUTION_ID'
           value: ${{ steps.tfoutput.outputs.frontend_cf_distribution_id }}
           repository: ${{ github.repository }}
-          token: ${{ secrets.FRONTEND_CLOUDFRONT_DISTRIBUTION_ID }}
+          token: ${{ secrets.MY_ACCESS_TOKEN }}
