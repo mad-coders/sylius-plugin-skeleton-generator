@@ -58,7 +58,7 @@ jobs:
           workdir: ""    # defaults to "PWD/unfor19-awscli"
 
       - name: deploy to S3
-        run: aws s3 sync -—delete ./dist s3://${{ secrets.FRONTEND_S3_BUCKET }} 
+        run: aws s3 sync ./dist s3://${{ secrets.FRONTEND_S3_BUCKET }} --delete
 
       # - name: Deploy
       #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
