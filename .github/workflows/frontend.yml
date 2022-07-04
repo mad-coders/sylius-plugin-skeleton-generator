@@ -11,7 +11,7 @@ on:
       - './frontend/**'
       - '.github/workflows/frontend.yml'
   workflow_dispatch:
-    
+
   
 jobs:
   build-angular:
@@ -61,4 +61,4 @@ jobs:
         run: aws s3 sync ./dist/* s3://${{ secrets.FRONTEND_S3_BUCKET }} --delete
 
       - name: Create CF Invalidation
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/"
+        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.FRONTEND_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
