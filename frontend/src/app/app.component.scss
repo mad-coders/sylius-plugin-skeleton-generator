@@ -1,3 +1,22 @@
 .warning-alert {
   @apply flex p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-200 dark:text-yellow-800
 }
+.github {
+  padding: 8px 12px;
+  border-radius: 50px;
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background-color: #4a5568;
+  color: #fff;
+  display: inline-flex;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+}
+
+.github svg {
+  width: 24px;
+  flex-shrink: 0;
+  margin-right: 6px;
+}
