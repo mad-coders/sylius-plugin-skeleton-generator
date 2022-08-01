@@ -147,7 +147,7 @@ resource "aws_route53_record" "app" {
 }
 
 resource "aws_acm_certificate" "cert" {
-  provider          = aws.us-east-1
+  //provider          = aws.us-east-1
   domain_name       = "${var.subdomain}.${var.zone}"
   validation_method = "DNS"
 
@@ -159,7 +159,7 @@ resource "aws_acm_certificate" "cert" {
 }
 
 resource "aws_acm_certificate_validation" "cert" {
-  provider                = aws.us-east-1
+  //provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.cert.arn
   validation_record_fqdns = [for record in aws_route53_record.cert : record.fqdn]
 }
@@ -191,6 +191,8 @@ resource "random_pet" "lambda_bucket_name" {
 resource "aws_s3_bucket" "lambda_bucket" {
   bucket = random_pet.lambda_bucket_name.id
   force_destroy = true
+
+  tags = var.project_tags
 }
 
 resource "aws_s3_bucket_acl" "lambda_bucket" {
@@ -227,8 +229,9 @@ resource "aws_lambda_function" "app" {
   handler = "lambda.handler"
 
   source_code_hash = data.archive_file.app.output_base64sha256
-
   role = aws_iam_role.lambda_exec.arn
+
+  tags = var.project_tags
 }
 
 
@@ -331,6 +334,11 @@ resource "aws_apigatewayv2_domain_name" "api_gw" {
     endpoint_type   = "REGIONAL"
     security_policy = "TLS_1_2"
   }
+
+  depends_on = [
+    aws_acm_certificate.cert,
+    aws_acm_certificate_validation.cert
+  ]
 }
 
 resource "aws_apigatewayv2_api_mapping" "api_gw" {
