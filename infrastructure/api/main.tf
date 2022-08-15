@@ -79,6 +79,16 @@ variable "subdomain" {
     }
 }
 
+variable "lambda_runtime" {
+  type = string
+  validation {
+    condition = length(var.lambda_runtime) > 0
+    error_message = "Lambda runtime is missing"
+  }
+
+  default = "nodejs16.x"
+}
+
 variable "project_tags" {
   type = object({
     env = string
@@ -208,6 +218,15 @@ data "archive_file" "app" {
   output_path = "${path.module}/app.zip"
 }
 
+
+data "archive_file" "node_modules" {
+  type = "zip"
+
+  source_dir  = "${path.module}/../../api/layers/node_modules"
+  output_path = "${path.module}/node_modules.zip"
+}
+
+
 resource "aws_s3_bucket_object" "app" {
   bucket = aws_s3_bucket.lambda_bucket.id
 
@@ -217,7 +236,25 @@ resource "aws_s3_bucket_object" "app" {
   etag = filemd5(data.archive_file.app.output_path)
 }
 
+resource "aws_s3_bucket_object" "node_modules" {
+  bucket = aws_s3_bucket.lambda_bucket.id
+
+  key    = "node_modules.zip"
+  source = data.archive_file.node_modules.output_path
+
+  etag = filemd5(data.archive_file.node_modules.output_path)
+}
+
 # lambda 
+
+resource "aws_lambda_layer_version" "node_modules" {
+  layer_name = "${local.full_project_name}_node_modules"
+
+  s3_bucket = aws_s3_bucket.lambda_bucket.id
+  s3_key    = aws_s3_bucket_object.node_modules.key
+
+  compatible_runtimes = [ var.lambda_runtime ]
+}
 
 resource "aws_lambda_function" "app" {
   function_name = local.full_project_name
@@ -225,7 +262,9 @@ resource "aws_lambda_function" "app" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_bucket_object.app.key
 
-  runtime = "nodejs16.x"
+  layers = [ aws_lambda_layer_version.node_modules.arn ]
+
+  runtime =  var.lambda_runtime
   handler = "lambda.handler"
 
   source_code_hash = data.archive_file.app.output_base64sha256
