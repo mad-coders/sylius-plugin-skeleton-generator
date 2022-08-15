@@ -1,0 +1,5 @@
+/.terraform
+/*.plan
+/app.zip
+/node_modules.zip
+/layers/*
