@@ -27,12 +27,12 @@ terraform {
 # providers config
 
 provider "aws" {
-    region  = "eu-central-1"
+  region = "eu-central-1"
 }
 
 provider "aws" {
   region = "us-east-1"
-  alias = "us-east-1"
+  alias  = "us-east-1"
 }
 
 
@@ -40,49 +40,49 @@ provider "aws" {
 # variables
 
 variable "project_name" {
-    type = string
-    validation {
-        condition     = length(var.project_name) > 0
-        error_message = "Project name is missing."
-    }
+  type = string
+  validation {
+    condition     = length(var.project_name) > 0
+    error_message = "Project name is missing."
+  }
 }
 
 variable "project_prefix" {
-    type = string
-    validation {
-        condition     = length(var.project_prefix) > 0
-        error_message = "Project prefix is missing."
-    }
+  type = string
+  validation {
+    condition     = length(var.project_prefix) > 0
+    error_message = "Project prefix is missing."
+  }
 }
 
 variable "env" {
-    type = string
-    validation {
-        condition     = length(var.env) > 0
-        error_message = "Project env is missing."
-    }
+  type = string
+  validation {
+    condition     = length(var.env) > 0
+    error_message = "Project env is missing."
+  }
 }
 
 variable "zone" {
-    type = string
-    validation {
-        condition     = length(var.zone) > 0
-        error_message = "DNS ZONE is missing."
-    }
+  type = string
+  validation {
+    condition     = length(var.zone) > 0
+    error_message = "DNS ZONE is missing."
+  }
 }
 
 variable "subdomain" {
-    type = string
-    validation {
-        condition     = length(var.subdomain) > 0
-        error_message = "DNS Subdomain is missing."
-    }
+  type = string
+  validation {
+    condition     = length(var.subdomain) > 0
+    error_message = "DNS Subdomain is missing."
+  }
 }
 
 variable "lambda_runtime" {
   type = string
   validation {
-    condition = length(var.lambda_runtime) > 0
+    condition     = length(var.lambda_runtime) > 0
     error_message = "Lambda runtime is missing"
   }
 
@@ -91,11 +91,11 @@ variable "lambda_runtime" {
 
 variable "project_tags" {
   type = object({
-    env = string
-    customer    = string
-    project     = string
-    component   = string
-    managedBy   = string
+    env       = string
+    customer  = string
+    project   = string
+    component = string
+    managedBy = string
   })
 
   validation {
@@ -127,14 +127,14 @@ variable "project_tags" {
 # locals
 
 locals {
-    full_project_name = "${var.project_prefix}-${var.project_name}-${var.env}"
+  full_project_name = "${var.project_prefix}-${var.project_name}-${var.env}"
 }
 
 
 # import resources for read
 
 data "aws_route53_zone" "app" {
-  name         = "${var.zone}"
+  name         = var.zone
   private_zone = false
 }
 
@@ -199,7 +199,7 @@ resource "random_pet" "lambda_bucket_name" {
 }
 
 resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = random_pet.lambda_bucket_name.id
+  bucket        = random_pet.lambda_bucket_name.id
   force_destroy = true
 
   tags = var.project_tags
@@ -253,7 +253,7 @@ resource "aws_lambda_layer_version" "node_modules" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_bucket_object.node_modules.key
 
-  compatible_runtimes = [ var.lambda_runtime ]
+  compatible_runtimes = [var.lambda_runtime]
 }
 
 resource "aws_lambda_function" "app" {
@@ -262,13 +262,13 @@ resource "aws_lambda_function" "app" {
   s3_bucket = aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_bucket_object.app.key
 
-  layers = [ aws_lambda_layer_version.node_modules.arn ]
+  layers = [aws_lambda_layer_version.node_modules.arn]
 
-  runtime =  var.lambda_runtime
+  runtime = var.lambda_runtime
   handler = "lambda.handler"
 
   source_code_hash = data.archive_file.app.output_base64sha256
-  role = aws_iam_role.lambda_exec.arn
+  role             = aws_iam_role.lambda_exec.arn
 
   tags = var.project_tags
 }
@@ -281,20 +281,20 @@ resource "aws_cloudwatch_log_group" "app" {
 }
 
 data "aws_iam_policy_document" "lambda_policy" {
-    version = "2012-10-17"
-    statement {
-      actions = ["sts:AssumeRole"]
-      effect = "Allow"
+  version = "2012-10-17"
+  statement {
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
 
-        principals {
-            identifiers = ["lambda.amazonaws.com"]
-            type = "Service"
-        }
+    principals {
+      identifiers = ["lambda.amazonaws.com"]
+      type        = "Service"
     }
+  }
 }
 
 resource "aws_iam_role" "lambda_exec" {
-  name = "serverless_lambda"
+  name               = "serverless_lambda"
   assume_role_policy = data.aws_iam_policy_document.lambda_policy.json
 }
 
