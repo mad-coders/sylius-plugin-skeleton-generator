@@ -306,7 +306,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 # gateway
 
 resource "aws_apigatewayv2_api" "lambda" {
-  name          = "serverless_lambda_gw"
+  name          = "${local.full_project_name}_gw"
   protocol_type = "HTTP"
 }
 
